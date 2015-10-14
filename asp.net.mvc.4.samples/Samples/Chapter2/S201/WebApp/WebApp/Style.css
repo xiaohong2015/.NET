@@ -1,0 +1,33 @@
+﻿#page
+{
+    width: 600px;margin: 10px auto;
+}
+body
+{
+    font-size: 12px;text-align: center;
+}
+
+table
+{
+    border: 1px solid #000000;margin: 10px auto;background-color: #eee;
+}  
+      
+tr
+{
+    line-height: 23px;
+}  
+      
+th
+{
+    background-color: #ccc;color: #fff;
+}                   
+
+tr:nth-child(odd)
+{
+    background-color: #fff;
+}
+
+td:nth-child(odd)
+{
+    width:150px;
+}
