@@ -1,0 +1,20 @@
+﻿@model Contact
+<html>
+    <head>
+        <title>ValidationMessage</title>
+        <style type="text/css">
+           .field-validation-error{color:Red}
+        </style>
+    </head>
+    <body>
+        <ul>
+           <li>@Html.ValidationMessageFor(c=>c.Name)</li>
+           <li>@Html.ValidationMessageFor(c=>c.PhoneNo)</li>
+           <li>@Html.ValidationMessageFor(c=>c.EmailAddress)</li>
+           <li>@Html.ValidationMessageFor(c=>c.Address.Province)</li>
+           <li>@Html.ValidationMessageFor(c=>c.Address.City)</li>
+           <li>@Html.ValidationMessageFor(c=>c.Address.District)</li>
+           <li>@Html.ValidationMessageFor(c=>c.Address.Street)</li>
+        </ul>
+    </body>
+</html>

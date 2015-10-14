@@ -1,0 +1,21 @@
+﻿@model IDictionary<string, HttpControllerDescriptor>
+<html>
+    <head>
+        <title>HttpController选择</title>
+        <link rel="stylesheet" href="~/Style.css" />
+    </head>
+    <body>
+        <table rules="all">
+            <tr>
+                <td>HttpControllerSelector</td>
+                <td>@ViewBag.ControllerSelector.GetType().Name</td>
+            </tr>
+            @foreach (var item in Model)
+            { 
+                <tr>
+                    <td>@item.Key</td><td>@item.Value.ControllerType.Name</td>
+                </tr>
+            }
+        </table>
+    </body>
+</html>

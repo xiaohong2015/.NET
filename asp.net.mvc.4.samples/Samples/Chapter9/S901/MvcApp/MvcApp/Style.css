@@ -1,0 +1,28 @@
+﻿body 
+{
+    font-size: .85em;
+    font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
+    color: #232323;
+    background-color: #fff;
+}       
+table
+{
+    width: 700px;
+    margin: 10px auto;
+    border: 1px solid #000000;
+    margin: 10px auto;
+    background-color: #eee;
+}                    
+tr
+{
+    line-height: 23px;
+}                    
+th
+{
+    background-color: #ccc;
+    color: #fff;
+}
+tr:nth-child(odd)
+{
+     background-color: #fff;
+}

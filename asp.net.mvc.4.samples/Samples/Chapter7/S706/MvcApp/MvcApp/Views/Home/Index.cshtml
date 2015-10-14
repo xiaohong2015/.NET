@@ -1,0 +1,19 @@
+﻿@model IEnumerable<ActionDescriptor>
+<html>
+<head>
+    <title>ActionDescriptor</title>    
+    <link rel="stylesheet" href="~/Style.css" /> 
+</head>
+<body>
+   <table rules="all">
+      <tr><th>ActionName</th><th>ActionDescriptor</th></tr>
+      @foreach (ActionDescriptor descriptor in Model)
+      { 
+        <tr>
+            <td>@descriptor.ActionName</td>
+            <td>@descriptor.GetType().Name</td>
+        </tr>
+      }
+   </table>
+</body>
+</html>

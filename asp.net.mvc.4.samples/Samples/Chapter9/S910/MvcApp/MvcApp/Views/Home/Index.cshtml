@@ -1,0 +1,19 @@
+﻿@model IEnumerable<HttpParameterBinding>
+<html>
+    <head>
+        <title>HttpParameterBindings</title>     
+        <link rel="stylesheet" href="~/Style.css" />    
+    </head>
+    <body>
+        <table rules="all">
+            <tr><th>Parameter</th><th>HttpParameterBinding</th></tr>
+            @foreach (var parameterBinding in Model)
+            { 
+                <tr>
+                    <td>@parameterBinding.Descriptor.ParameterName</td>
+                    <td>@parameterBinding.GetType().Name</td>
+                </tr>
+            }             
+        </table>
+    </body>
+</html>

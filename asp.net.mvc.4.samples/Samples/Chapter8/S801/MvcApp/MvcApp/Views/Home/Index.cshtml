@@ -1,0 +1,16 @@
+﻿@model IDictionary<ActionDescriptor, ActionResult>
+<html>
+<head>
+    <title>ActionResults</title>
+    <link rel="stylesheet" href="~/Style.css" />
+</head>
+<body>
+   <table rules="all">
+        <tr><th>ActionName</th><th>ActionResult</th></tr>
+        @foreach (var item in Model)
+        { 
+           <tr><td>@item.Key.ActionName</td><td>@item.Value.GetType().Name</td></tr>
+        }
+   </table>
+</body>
+</html>

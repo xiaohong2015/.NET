@@ -1,0 +1,19 @@
+﻿@model IEnumerable<ControllerDescriptor>
+<html>
+<head>
+    <title>ControllerDescriptor</title>
+    <link rel="stylesheet" href="~/Style.css" />
+</head>
+<body>
+   <table rules="all">
+      <tr><th>Controller</th><th>ControllerDescriptor</th></tr>
+      @foreach (ControllerDescriptor descriptor in Model)
+      { 
+        <tr>
+            <td>@descriptor.ControllerType.Name</td>
+            <td>@descriptor.GetType().Name</td>
+        </tr>
+      }
+   </table>
+</body>
+</html>

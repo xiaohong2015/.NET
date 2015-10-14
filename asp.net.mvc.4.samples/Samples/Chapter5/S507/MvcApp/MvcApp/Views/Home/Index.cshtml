@@ -1,0 +1,27 @@
+﻿@model ActionDescriptor
+<html>
+<head>
+    <title>针对参数的ModelBinder</title>
+    <link rel="stylesheet"  href="~/Style.css" />
+</head>
+<body>
+   <table rules="all">
+     <tr><th>Parameter</th><th>ModelBinder</th></tr>
+     @foreach (var parameter in Model.GetParameters())
+     { 
+         string binderType = "N/A";
+         IModelBinder binder = parameter.BindingInfo.Binder ??
+             ModelBinders.Binders.GetBinder(parameter.ParameterType);
+         if(null != binder)
+         {
+            binderType = binder.GetType().Name;
+         }         
+        <tr><td>@parameter.ParameterName</td><td>@binderType</td></tr>
+     }
+   </table>
+</body>
+</html>
+
+
+
+

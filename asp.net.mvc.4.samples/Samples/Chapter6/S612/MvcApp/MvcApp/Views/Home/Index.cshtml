@@ -1,0 +1,15 @@
+﻿@model ModelValidator[]
+<html>
+<head>
+    <title>ModelValidators</title>     
+    <link rel="stylesheet" href="~/Style.css" />
+</head>
+<body>
+    <table rules="all">        
+       @for(int i= 0; i<Model.Length; i++)
+       {
+          <tr><td>@(i+1)</td><td>@Model[i].GetType().Name</td></tr>
+       }
+    </table>
+</body>
+</html>

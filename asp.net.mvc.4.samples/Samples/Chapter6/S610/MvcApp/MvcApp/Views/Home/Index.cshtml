@@ -1,0 +1,17 @@
+﻿@model Contact
+<html>
+<head>
+    <title>Model绑定中的验证</title>   
+    <style type="text/css">
+        .field-validation-error{color:Red}
+    </style>
+</head>
+    <body>
+         @using (Html.BeginForm())
+         { 
+            @Html.EditorForModel()
+            @Html.EditorFor(m=>m.Address)
+            <input type="submit" value="保存" />
+         }
+    </body>
+</html>

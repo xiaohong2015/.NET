@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Type>
+<html>
+    <head>
+        <title>HttpController类型的解析</title>
+        <link rel="stylesheet" href="~/Style.css" />
+    </head>
+    <body>
+        <table rules="all">
+            <tr>
+                <td>HttpControllerTypeResolver</td>
+                <td>@ViewBag.ControllerTypeResolver.GetType().Name</td>
+            </tr>
+            <tr>
+                <td>AssembliesResolver</td>
+                <td>@ViewBag.AssembliesResolver.GetType().Name</td>
+            </tr>
+            @{
+                var controllerTypes = Model.ToArray();
+                <tr>
+                    <td rowspan="@Model.Count()">HttpController</td>
+                    <td>@controllerTypes[0].Name</td>
+                </tr>
+                for(int i=1; i<controllerTypes.Length; i++)
+                {
+                    <tr><td>@controllerTypes[i].Name</td></tr>
+                }
+             }
+        </table>
+    </body>
+</html>

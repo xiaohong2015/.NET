@@ -1,0 +1,18 @@
+﻿@model IEnumerable<ModelValidationResult>
+<html>
+<head>
+    <title>验证结果</title>
+    <link rel="stylesheet" href="~/Style.css" />  
+</head>
+<body>
+    <table rules="all">
+        <tr><th>Member</th><th>Message</th></tr>
+        @foreach (ModelValidationResult result in Model)
+        {
+            string propertyName = string.IsNullOrEmpty(result.MemberName) ? "N/A" : result.MemberName;              
+           <tr><td>@propertyName</td><td>@result.Message</td></tr>
+        }       
+    </table>
+</body>
+</html>
+

@@ -1,0 +1,24 @@
+﻿@model IEnumerable<HttpActionDescriptor>
+<html>
+    <head>
+        <title>Action对HTTP方法的支持</title>
+        <link rel="stylesheet" href="~/Style.css" />
+    </head>
+    <body>
+        <table rules="all">
+          <tr><th>Action Name</th><th>HTTP Method</th></tr>
+          @foreach (var action in Model)
+          {
+              var httpMethods = action.SupportedHttpMethods.ToArray();
+              <tr>
+                <td rowspan="@httpMethods.Length">@action.ActionName</td>
+                <td>@httpMethods[0]</td>
+              </tr>
+              for (int i = 1; i < httpMethods.Length; i++)
+              { 
+                <tr><td>@httpMethods[i]</td></tr>
+              }              
+          }
+        </table>
+    </body>
+</html>

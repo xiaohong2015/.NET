@@ -1,0 +1,107 @@
+﻿<html>
+    <head>
+        <title>联系人管理</title>
+        <script type="text/javascript" src="../../Scripts/jquery-1.7.1.js"></script>
+        <script type="text/javascript" src="../../Scripts/knockout-2.1.0.js"></script>   
+        <link rel="stylesheet"  href="~/Style.css" />   
+    </head>
+    <body>
+    <div id="contacts">
+         <table rules="all">
+            <tr>
+                <th>姓名</th>
+                <th>电话号码</th>
+                <th>Email地址</th>
+                <th></th>
+            </tr>
+            <tbody>
+                <!-- ko foreach: allContacts-->
+                <tr>
+                    <td data-bind="text: Name" />
+                    <td data-bind="text: PhoneNo" />
+                    <td>
+                        <input type="text" class="textbox long" data-bind="value: EmailAddress"/>
+                    </td>
+                    <td>
+                        <a href="#" data-bind="click: $root.updateContact">修改</a>
+                        <a href="#" data-bind="click: $root.deleteContact">删除</a>
+                    </td>
+                </tr>
+                <!-- /ko -->
+                <tr data-bind="with: addedContact">
+                    <td>
+                        <input type="text" class="textbox" data-bind="value: Name"/>
+                    </td>
+                    <td>
+                        <input type="text" class="textbox" data-bind="value: PhoneNo"/>
+                    </td>
+                    <td>
+                        <input type="text" class="textbox long" data-bind="value: EmailAddress"/>
+                    </td>
+                    <td>
+                        <a href="#" data-bind="click: $root.addContact">添加</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script type="text/javascript" >
+        function ContactViewModel() {
+            self = this;
+            self.allContacts	= ko.observableArray();
+            self.addedContact 	= ko.observable();
+
+            //加载联系人列表
+            self.loadContacts = function () {
+                $.get("/api/contacts", null, function (data) {
+                    self.allContacts(data);
+                    var emptyContact = { Id: "", Name: "", PhoneNo: "", EmailAddress: "" };
+                    self.addedContact(emptyContact);
+                });
+            };
+
+            //添加联系人
+            self.addContact = function (data) {
+                if (!self.validate(data)) {
+                    return;
+                }
+                $.ajax({
+                    url: "/api/contacts/",
+                    data: self.addedContact(),
+                    type: "PUT",
+                    success: self.loadContacts
+                });
+            };
+
+            //修改联系人信息
+            self.updateContact = function (data) {
+                $.ajax({
+                    url: "/api/contacts/",
+                    data: data,
+                    type: "POST",
+                    success: self.loadContacts
+                });                        
+            };
+
+            //删除联系人
+            self.deleteContact = function (data) {
+                $.ajax({
+                    url: "/api/contacts/" + data.Id,
+                    type: "DELETE",
+                    success: self.loadContacts
+                });
+            };
+
+            self.validate = function (data) {
+                if (data.Name && data.PhoneNo && data.EmailAddress) {
+                    return true;
+                }
+                alert("请输入完整联系人信息!");
+                return false;
+            }
+            self.loadContacts();
+        }
+        ko.applyBindings(new ContactViewModel());
+    </script>
+    </body>
+</html>

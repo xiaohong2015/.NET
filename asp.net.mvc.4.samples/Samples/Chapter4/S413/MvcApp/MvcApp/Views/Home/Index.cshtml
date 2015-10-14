@@ -1,0 +1,13 @@
+﻿@model Employee
+<html>
+    <head>
+        <title>编辑员工信息</title>
+    </head>
+    <body>
+        @using(Html.BeginForm())
+        {
+            @Html.EditorForModel()
+            <input type="submit" value="保存" />
+        }
+    </body>
+</html>

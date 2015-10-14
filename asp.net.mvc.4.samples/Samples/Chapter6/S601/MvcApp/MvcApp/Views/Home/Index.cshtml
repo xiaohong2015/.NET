@@ -1,0 +1,29 @@
+﻿@model IEnumerable<ModelValidator>
+<html>
+<head>
+    <title>DataErrorInfoModelValidatorProvider</title>   
+    <link rel="stylesheet" href="~/Style.css" />  
+</head>
+@{
+    Contact contact = new Contact();
+}
+<body>
+    <table rules="all">
+        <tr><th>ModelValidator</th><th>Message</th></tr>
+        @foreach (var validator in Model)
+        {
+            ModelValidationResult[]  results = 
+                validator.Validate(contact).ToArray();
+            string firstMessage = (results.Any() ? 
+                results.First().Message : "N/A");
+            <tr>
+                <td rowspan="@results.Length">@validator.GetType().Name</td>
+                <td>@firstMessage</td></tr>
+            for (int i = 1; i < results.Length; i++)
+            { 
+                <tr><td>@results[i].Message</td></tr>
+            }            
+        }
+    </table>
+</body>
+</html>
