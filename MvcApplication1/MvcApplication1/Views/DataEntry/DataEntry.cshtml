@@ -1,0 +1,569 @@
+﻿@{
+    ViewBag.Title = "DataEntry";
+}
+
+<style>
+    body {
+        margin-left: 200px;
+        width: 960px;
+    }
+    #divQuestion {
+        border-style: dotted;
+        border-width: 2px;
+        border-color: green;
+        width: 956px;
+    }
+    #divDataShow table {
+	    border-style: dotted;
+	    border-width: 2px;
+	    border-color: green; 
+	    font-style: oblique; 
+	    text-align: center;
+        
+        font-size: 16px;
+        width: auto;
+        height: 18px;
+        margin-left: 5px;
+    }
+    #divDataShow table tr td {
+        width: auto;
+    }
+    .input {
+        text-align: center;
+        font-size: 14px;
+        width: 80px;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function () {
+        window.moveTo(0, 0);
+        window.resizeTo(window.screen.width, window.screen.height-25);
+    });
+
+    // tableCustom*************
+    // $("#test").text(str);  $(this).appendTo($("#test"));
+    function edit(node) {
+        var tr = node.parentNode.parentNode;
+        var departname;
+        // 循环当前行每个单元cell，并把值放在新建元素input-text中显示。rowIndex
+        for (var i = 1; i < tr.cells.length - 1; i++) {
+            var td = tr.cells[i];
+            // 存放departname值
+            if (i == 2) {
+                departname = td.innerText;
+            }
+
+            var input = inputTemplate();
+            input.val(td.innerText);
+            
+            // 长度修整
+            input.width($(td).css("width"));
+            //input.width((td.clientWidth* 0.8));
+            //input.width(td.offsetWidth);
+
+            td.innerHTML = "";
+            input.appendTo(td);
+        }
+        // 获取所有departname，并写入新建元素select-option中显示。
+        var select = $("<select id='departnameId' name='departID'/>");
+        $.getJSON("DepartnameList",
+            {},
+            function (data) {
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    if (departname == data[i].departname) {
+                        $(select).append("<option value='" + data[i].id + "' selected>" + data[i].departname + "</option>");
+                    } else {
+                        $(select).append("<option value='" + data[i].id + "'>" + data[i].departname + "</option>");
+                    }
+                }
+            });
+        // 使用select显示departname
+        //$(select).find("option[text='" + departname + "'").attr("selected", true);
+        var td = tr.cells[2];
+        td.innerHTML = "";
+        select.appendTo(td);
+
+        reverseButton(node.parentNode);        
+    }
+    function cancel(node, id) {
+        var tr = node.parentNode.parentNode;
+        // 根据id获取原数据
+        var custom = new Array();
+        $.getJSON("/DataEntry/CreateCustomView",
+            { id: id }, 
+            function (data) {
+                if (data != null) {
+                    custom[0] = data.id;
+                    custom[1] = data.cname;
+                    custom[2] = data.department.departname;
+                    custom[3] = data.age;
+                    custom[4] = data.ename;
+                    custom[5] = data.password;
+
+                    // 循环当前行每个单元input-text，并把值放在文本格式中显示。
+                    for (var i = 0; i < tr.cells.length - 1 && i < custom.length; i++) {
+                        var td = tr.cells[i];
+                        td.innerHTML = custom[i];
+                    }
+                    // 操作按钮反转
+                    reverseButton(node.parentNode);
+                } else {
+                    // 系统出错
+                    location.reload(true);
+                    var url = location.href;
+                    url = url.substring(0, url.lastIndexOf("#")) + "#tableCustom";
+                    window.location.href = url;
+                }
+            });
+    }
+    function del(node, id) {
+       $.getJSON("/DataEntry/DeleteCustom", 
+            { id: id }
+        );
+        node.parentNode.parentNode.remove();
+    }
+    function checkForm(node) {
+        var tr = node.parentNode.parentNode;
+        for (var i = 0; i < tr.cells.length; i++) {
+            var td = tr.cells[i];
+            if ($(td).find("input").val() == "") {
+                alert("please input the text");
+                return false;
+            }
+        }
+        return true;
+    }
+    function save(node, id) {
+        var tr = node.parentNode.parentNode;
+        if (checkForm(node) == true) {
+            var tr = node.parentNode.parentNode;
+            // 循环当前行每个单元input-text，并把值写入custom-json变量，再传到后台update
+            var custom= {
+                    id: id
+                    , cname: $(tr.cells[1]).find("input").val()
+                    , departID: $(tr.cells[2]).find("select").find("option:selected").val()
+                    , age: $(tr.cells[3]).find("input").val()
+                    , ename: $(tr.cells[4]).find("input").val()
+                    , password: $(tr.cells[5]).find("input").val()
+                
+            };
+            
+            $.getJSON("/DataEntry/CreateCustom",
+                custom,
+                function (data) {
+                    if (id == 0 && data.message == "success") {
+                        // insert
+                        // 重写按钮
+                        var str = "<button onclick=edit(this) style=display:none;>编辑</button><button onclick='del(this, " + data.id + ")' style=display:none;>删除</button>"
+                        + "<button onclick='save(this, " + data.id + ")'>保存</button><button onclick='cancel(this, " + data.id + ")'>取消</button>";
+                        
+                        tr.cells[tr.cells.length - 1].innerHTML = str;
+                       
+                        // 回显数据
+                        cancel($(tr.cells[tr.cells.length - 1]).find("button").get(0), data.id);
+                    } else {
+                        // update
+                        // 回显数据
+                        cancel(node, id);
+                    }
+                });
+        } else {
+            alert("保存失败");
+            // 回显数据
+            cancel(node, id);
+        }
+    }
+    function checkFormDepartment(node) {
+        var tr = node.parentNode.parentNode;
+        for (var i = 0; i < tr.cells.length; i++) {
+            var td = tr.cells[i];
+            if ($(td).find("input").val() == "") {
+                alert("please input the text");
+                return false;
+            }
+        }
+        return true;
+    }
+    function saveDepartment(node, id) {
+        var tr = node.parentNode.parentNode;
+        if (checkFormDepartment(node) == true) {
+            var tr = node.parentNode.parentNode;
+            // 循环当前行每个单元input-text，并把值写入department-json变量，再传到后台update
+            var department = {
+                    id: id
+                    , departname: $(tr.cells[1]).find("input").val()
+                    , description: $(tr.cells[2]).find("input").val()
+            };
+            
+            $.getJSON("/DataEntry/CreateDepartment",
+                department,
+                function (data) {
+                    if (id == 0 && data.message == "success") {
+                        // insert
+                        // 重写按钮
+                        var str = "<button onclick=editDepartment(this) style=display:none;>编辑</button><button onclick='delDepartment(this, " + data.id + ")' style=display:none;>删除</button>"
+                        + "<button onclick='saveDepartment(this, " + data.id + ")'>保存</button><button onclick='cancelDepartment(this, " + data.id + ")'>取消</button>";
+                        
+                        tr.cells[tr.cells.length - 1].innerHTML = str;
+
+                        // 回显数据
+                        cancelDepartment($(tr.cells[tr.cells.length - 1]).find("button").get(0), data.id);
+                    } else {
+                        alert(data.message);
+                        // update
+                        // 回显数据
+                        cancelDepartment(node, id);
+                    }
+                });
+        } else {
+            alert("保存失败");
+            // 回显数据
+            cancelDepartment(node, id);
+        }
+    }
+    function tableDepartmentAdd() {
+        id = "#tableDepartment";
+        // 创建一行
+        var newTr = $(id).get(0).insertRow($(id).get(0).rows.length);
+
+        var td0 = newTr.insertCell(0);
+        td0.innerHTML = "-";
+
+        var td1 = newTr.insertCell(1);
+        inputTemplate().appendTo(td1);
+
+        var td2 = newTr.insertCell(2);
+        inputTemplate().appendTo(td2);
+
+        var td3 = newTr.insertCell(3);
+        td3.innerHTML = "<button onclick='saveDepartment(this, 0)'>保存</button><button onclick=removeTr(this)>取消</button>";
+    }
+    function tableCustomAdd() {
+        id = "#tableCustom";
+        // 创建一行
+        var newTr = $(id).get(0).insertRow($(id).get(0).rows.length);
+
+        // 获取所有departname，并写入新建元素select-option中显示。
+        var select = $("<select id='departnameId' name='departID'/>");
+        $.getJSON("DepartnameList",
+            {},
+            function (data) {
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    $(select).append("<option value='" + data[i].id + "'>" + data[i].departname + "</option>");
+                }
+            });
+
+        var td0 = newTr.insertCell(0);
+        td0.innerHTML = "-"; // $(id).find("tbody tr").length;
+
+        var td1 = newTr.insertCell(1);
+        inputTemplate().appendTo(td1);
+
+        var td2 = newTr.insertCell(2);
+        select.appendTo(td2);
+
+        var td3 = newTr.insertCell(3);
+        inputTemplate().appendTo(td3);
+
+        var td4 = newTr.insertCell(4);
+        inputTemplate().appendTo(td4);
+
+        var td5 = newTr.insertCell(5);
+        inputTemplate().appendTo(td5);
+
+        var td6 = newTr.insertCell(6);
+        td6.innerHTML = "<button onclick='save(this, 0)'>保存</button><button onclick=removeTr(this)>取消</button>";
+
+    }
+
+    // tableDepartment******************
+    function editDepartment(node) {
+        var tr = node.parentNode.parentNode;
+        for (var i = 1; i < tr.cells.length-1; i++) {
+            var td = tr.cells[i];
+
+            var input = inputTemplate();
+            input.width($(td).css("width"));
+            input.val(td.innerText);
+
+            td.innerHTML = "";
+            input.appendTo(td);
+        }
+        reverseButton(node.parentNode);
+    }
+    function delDepartment(node, id) {
+        $.getJSON("/DataEntry/DeleteDepartment",
+            { id: id }
+            );
+        //node.parentNode.parentNode.remove();
+        location.reload(true);
+        var url = location.href;
+        if (url.indexOf("#") < 1) {
+            url += "#tableDepartment";
+        }
+        jumpTableDepartment();
+    }
+    function jumpTableDepartment() {
+        location.reload(true);
+        var url = location.href;
+        url = url.substring(0, url.lastIndexOf("#")) + "#tableDepartment";
+        window.location.href = url;
+    }
+    function cancelDepartment(node, id) {
+        var tr = node.parentNode.parentNode;
+        // 根据id获取原数据
+        var department = new Array();
+
+        $.getJSON("/DataEntry/CreateDepartmentView",
+            { id: id },
+            function (data) {
+                if(data!= null) {
+                    department[0]= data.id;
+                    department[1]= data.departname;
+                    department[2]= data.description;
+                    // 循环当前行每个单元input-text，并把值放在文本格式中显示。
+                    for(var i=0; i< tr.cells.length-1; i++) {
+                        var td= tr.cells[i];
+                        td.innerHTML= department[i];
+                    }
+                    // 操作按钮反转
+                    reverseButton(node.parentNode);
+                } else {
+                    // 系统出错
+                    jumpTableDepartment();
+                }
+            });
+    }
+
+    // utility******************
+    // 创建input模板
+    function inputTemplate() {
+        var input = $("<input type='text'/>");
+        $(input).addClass("input");
+        return input;
+    }
+    // 移除一行
+    function removeTr(node) {
+        node.parentNode.parentNode.remove();
+    }
+    // 按钮状态反转
+    function reverseButton(td) {
+        for (var i = 0; i < $(td).find("button").length; i++) {
+            var btn = $(td).find("button")[i];
+            if ($(btn).css("display") == "none") {
+                $(btn).css("display", "inline-block");
+            } else {
+                $(btn).css("display", "none");
+            }
+        }
+    }
+
+    // search ***********************
+    function cnameQuery() {
+        var key = $("#cnameText").val();
+        if (key != null && key != "") {
+            $.getJSON("/DataEntry/CnameQuery",
+                { cname: key },
+                function (data) {
+                    if (data != null) {
+                        $("#tableCustom").find("tr:not(:first)").remove();
+                        for (var i = 0; i < data.length; i++) {
+                            var td = Mustache.render($("#tableCustomMustache").html(), data[i]);
+                            var tr = $("#tableCustom").get(0).insertRow($("#tableCustom").get(0).rows.length);
+                            $(tr).append(td);
+                        }
+                    } else {
+                        alert("not found");
+                    }
+                });
+        } else {
+            $("#cnameText").focus();
+        }
+    }
+    function departnameQuery() {
+        var key = $("#departnameText").val();
+        if (key != null && key != "") {
+            $.getJSON("/DataEntry/DepartnameQuery",
+                { departname: key },
+                function (data) {
+                    if (data != null) {
+                        $("#tableDepartment").find("tr:not(:first)").remove();
+                        for (var i = 0; i < data.length; i++) {
+                            var td = Mustache.render(tableDepartmentMustache.innerHTML, data[i]);
+                            var tr = $("#tableDepartment").get(0).insertRow($("#tableDepartment").get(0).rows.length);
+                            $(tr).append(td);
+                        }
+                    } else {
+                        alert("not found");
+                    }
+                });
+        } else {
+            $("#departnameText").focus();
+        }
+    }
+
+    function initCustom() {
+        $.getJSON("/DataEntry/CustomQuery",
+            {},
+            function (data) {
+                if (data != null) {
+                    $("#tableCustom").find("tr:not(:first)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        var td = Mustache.render($("#tableCustomMustache").html(), data[i]);
+                        var tr = $("#tableCustom").get(0).insertRow($("#tableCustom").get(0).rows.length);
+                        $(tr).append(td);
+                    }
+                } else {
+                    jumpTableDepartment();
+                }
+            });
+    }
+
+    function initDepartment() {
+        $.getJSON("/DataEntry/DepartmentQuery",
+            {},
+            function (data) {
+                if (data != null) {
+                    $("#tableDepartment").find("tr:not(:first)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        var td = Mustache.render(tableDepartmentMustache.innerHTML, data[i]);
+                        var tr = $("#tableDepartment").get(0).insertRow($("#tableDepartment").get(0).rows.length);
+                        $(tr).append(td);
+                    }
+                } else {
+                    jumpTableDepartment();
+                }
+            });
+    }
+</script>
+<body>
+<h2><a href="@Url.Content("~/#DivDataEntry")">back</a></h2>
+
+<h2>实验要求</h2>
+<div id="divQuestion">
+    <ol>
+        <li>设计一个基于Web的应用程序，在程序中嵌入Sql的代码实现对custom，department表中的记录进行：插入、修改、删除、查询的操作。</li>
+        <li>设计一个基于Web的应用程序，在程序中使用存储过程实现对custom，department表中的记录进行：插入、修改、删除、查询的操作。</li>
+        <li>设计一个基于Web的应用程序，采用3层结构的方式实现对custom，department表中的记录进行：插入、修改、删除、查询的操作。(作为课程设计要求学生写出详细的设计文档或实验报告)</li>
+        <li>设计一个基于Web的应用程序，采用ORM（主要就是Ling或EF的方式）对custom，department表中的记录进行：插入、修改、删除、查询的操作。</li>
+        <li>使用强类型的Dataset的方法对custom，department表中的记录进行：插入、修改、删除、查询的操作。界面可以采用WebForm或WinForm。</li>
+    </ol>
+</div>
+<div id="divDataShow">
+    <h2>实验结果</h2>    
+    
+    <section>
+        <input type="text" placeholder="cname 查询" id="cnameText"/>
+        <input type="button" value="查询" onclick="cnameQuery()" />
+        <input type="button" value="还原列表" onclick="initCustom()"/>
+    </section>
+    <section style="display:none;">
+        <table>
+        <tr id="tableCustomMustache">
+            <td>{{id}}</td>
+            <td>{{cname}}</td>
+            <td>{{department.departname}}</td>
+            <td>{{age}}</td>
+            <td>{{ename}}</td>
+            <td>{{password}}</td>
+            <td colspan="2">
+                <button onclick="edit(this)">编辑</button>
+                <button onclick="del(this, '{{id}}')">删除</button>
+                <button onclick="save(this, '{{id}}')" style="display:none;">保存</button>
+                <button onclick="cancel(this, '{{id}}')" style="display:none;">取消</button>
+            </td>
+        </tr>
+        </table>
+    </section>
+
+    <table id="tableCustom">
+        <thead>
+            <tr>
+                <td>id</td>
+                <td>cname</td>
+                <td>departname</td>
+                <td>age</td>
+                <td>ename</td>
+                <td>password</td>
+                <td colspan="2"><button onclick="tableCustomAdd()">添加</button></td>
+            </tr>
+        </thead>
+
+        <tbody>
+        @foreach(var c in ViewBag.list1)
+        {
+             <tr>
+                <td>@c.id</td>
+                <td>@c.cname</td>
+                <td>@c.department.departname</td>
+                <td>@c.age</td>
+                <td>@c.ename</td>
+                <td>@c.password</td>
+                <td colspan="2">
+                    <button onclick="edit(this)">编辑</button>
+                    <button onclick="del(this, '@c.id')">删除</button>
+                    <button onclick="save(this, '@c.id')" style="display:none;">保存</button>
+                    <button onclick="cancel(this, '@c.id')" style="display:none;">取消</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    
+    <section>
+        <input type="text" placeholder="department 查询" id="departnameText"/>
+        <input type="button" value="查询" onclick="departnameQuery()"/>
+        <input type="button" value="还原列表" onclick="initDepartment()"/>
+    </section>
+    
+    <section style="display:none;">
+        <table>
+        <tr id="tableDepartmentMustache">
+            <td>{{id}}</td>
+            <td>{{departname}}</td>
+            <td>{{description}}</td>
+            <td colspan="2">
+                <button onclick="editDepartment(this)">编辑</button>
+                <button onclick="delDepartment(this, '{{id}}')">删除</button>
+                <button onclick="saveDepartment(this, '{{id}}')" style="display:none;">保存</button>
+                <button onclick="cancelDepartment(this, '{{id}}')" style="display:none;">取消</button>
+            </td>
+        </tr>
+        </table>
+    </section>
+
+    <table id="tableDepartment">
+        <thead>
+            <tr>
+                <td>id</td>
+                <td>department</td>
+                <td>description</td>
+                <td colspan="2"><button onclick="tableDepartmentAdd()">添加</button></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var c in ViewBag.list2)
+            {
+                <tr>
+                    <td>@c.id</td>
+                    <td>@c.departname</td>
+                    <td>@c.description</td>
+                    <td colspan="2">
+                        <button onclick="editDepartment(this)">编辑</button>
+                        <button onclick="delDepartment(this, '@c.id')">删除</button>
+                        <button onclick="saveDepartment(this, '@c.id')" style="display:none;">保存</button>
+                        <button onclick="cancelDepartment(this, '@c.id')" style="display:none;">取消</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+<span id="test"></span>
+</body>

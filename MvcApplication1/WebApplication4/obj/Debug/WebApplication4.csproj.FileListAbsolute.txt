@@ -1,0 +1,5 @@
+C:\Users\xiaohong\Documents\WorkStation\VS2012\MvcApplication1\WebApplication4\bin\Web.dll
+C:\Users\xiaohong\Documents\WorkStation\VS2012\MvcApplication1\WebApplication4\bin\Web.pdb
+C:\Users\xiaohong\Documents\WorkStation\VS2012\MvcApplication1\WebApplication4\obj\Debug\Web.dll
+C:\Users\xiaohong\Documents\WorkStation\VS2012\MvcApplication1\WebApplication4\obj\Debug\Web.pdb
+C:\Users\xiaohong\Documents\WorkStation\VS2012\MvcApplication1\WebApplication4\obj\Debug\WebApplication4.csprojResolveAssemblyReference.cache

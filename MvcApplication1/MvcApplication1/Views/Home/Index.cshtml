@@ -1,0 +1,19 @@
+﻿
+@{ ViewBag.title= "index";}
+
+<script>
+    $(document).ready(function () {
+        window.resizeTo(475, 695);
+        window.moveTo((window.screen.width - 475) / 2, 0);
+        /*
+        if (history.previous != history.current) {
+            alert("go");
+            location.reload();
+        }
+        //*/
+    });
+</script>
+<div id="DivDataEntry" style="text-align:center;">
+    <a href="/DataEntry/DataEntry"><img src="@Url.Content("~/Images/DataEntry.JPG")" alt="DataEntry" /></a>
+</div>
+<!-- 440 587 -->
